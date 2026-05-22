@@ -7,10 +7,12 @@
 // NUM_ATTACKS: represents the maximum number of attacks that a pokemon can have
 // NAME_SIZE: represents the pokemon's name size based on the biggest pokemon name registered (which contains 36 characters)
 // SIZE: standard size for other strings
+
 #define MAX_TYPES 2
 #define MAX_MOVES 4
 #define NAME_SIZE 37
 #define SIZE 20
+
 
 // ENUMS:
 
@@ -73,17 +75,34 @@ typedef struct {
     double height;
 } Pokemon;
 
-// Pokemon creation
-Pokemon create_pokemon(void);
+// AUXILIAR FUNCTIONS: 
 
-// Display functions
-void print_pokemon(Pokemon p);
-void print_move(Move m);
-
-// battle functions
+// @brief Simulates an attack from one pokemon to another using a selected move
+// @params attacker Pointer to the attacking pokemon
+// @params defender Pointer to the defending pokemon
+// @params move Move used during the attack
+// @return void
 void attack_pokemon(Pokemon *attacker, Pokemon *defender, Move move);
 
-// utility functions
-int is_alive(Pokemon p);
+// 'create_pokemon'
+// @brief Creates and initializes a pokemon structure
+// @params void
+// @return A fully initialized Pokemon structure
+Pokemon create_pokemon(void);
+
+// @brief Checks whether a pokemon is still alive
+// @params p Pokemon to be checked
+// @return 1 if the pokemon still has HP, otherwise 0
+int is_alive(Pokemon *p);
+
+// @brief Displays all relevant pokemon information on screen
+// @params p Pokemon to be displayed
+// @return void
+void print_pokemon(Pokemon *p);
+
+// @brief Displays all relevant move information on screen
+// @params m Move to be displayed
+// @return void
+void print_move(Move *m);
 
 #endif
