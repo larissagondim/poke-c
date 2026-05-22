@@ -50,6 +50,7 @@ typedef enum {
 // 'Move'
 // Structure that simulates which pokemon attack attributes to make battles more interesting
 typedef struct {
+    char name[NAME_SIZE];
     PokemonType type;
     MoveCategory category;
     int power; // base damage power of the move
@@ -60,15 +61,16 @@ typedef struct {
 // 'Pokemon'
 // Structure that represents basic pokemon stats that will simulate its battle dynamics
 typedef struct {
-    char name[NAME_SIZE];
+    char name[SIZE];
     char types[MAX_TYPES][SIZE]; // pokemon type(s) (e.g. fire and flying)
+    char sex; // F for Female | M for male
     Move moves[MAX_MOVES]; // list of moves the pokemon can use
     int pokedex_code; // national pokédex identification number
     int level; // current pokemon level
     int hp; // health points
     int speed; // determines attack order in battle
     int attack; // physical attack stat
-    int deffense; // physical defense stat
+    int defense; // physical defense stat
     int sp_atk; // special attack stat
     int sp_def; // special deffense stat
     double weight;
@@ -81,28 +83,65 @@ typedef struct {
 // @params attacker Pointer to the attacking pokemon
 // @params defender Pointer to the defending pokemon
 // @params move Move used during the attack
-// @return void
-void attack_pokemon(Pokemon *attacker, Pokemon *defender, Move move);
+// @return 0 if it's a special attack or if it misses (no damage)
+// @return 1 if the attack hits
+// @return -1 if there's no registered attacker or defender
+// @return -2 if there are no moves left
+int attack_pokemon(Pokemon *attacker, Pokemon *defender, Move *move);
+
+// @brief Returns the chance of attack hit based on its precision
+// @param chance Move's precision
+// @return 1 if it hits, otherwise 0
+int chance_hit(float chance);
+
+// 'create_move'
+// @brief Creates and initializes a move structure
+// @params Move basic attributes
+// @return A fully initialized Move structure
+Move create_move(
+    char name[],
+    PokemonType type,
+    MoveCategory category,
+    int power,
+    int PP,
+    float precision
+);
 
 // 'create_pokemon'
 // @brief Creates and initializes a pokemon structure
-// @params void
+// @params Pokemon basic attributes
 // @return A fully initialized Pokemon structure
-Pokemon create_pokemon(void);
+Pokemon create_pokemon(
+    char name[],
+    char types[MAX_TYPES][SIZE],
+    char sex,
+    int pokedex_code,
+    int level,
+    int hp,
+    int attack,
+    int defense,
+    int sp_atk,
+    int sp_def,
+    int speed,
+    double height,
+    double weight
+);
+
 
 // @brief Checks whether a pokemon is still alive
 // @params p Pokemon to be checked
 // @return 1 if the pokemon still has HP, otherwise 0
+// @return -1 if the pokemón isn't there
 int is_alive(Pokemon *p);
-
-// @brief Displays all relevant pokemon information on screen
-// @params p Pokemon to be displayed
-// @return void
-void print_pokemon(Pokemon *p);
 
 // @brief Displays all relevant move information on screen
 // @params m Move to be displayed
 // @return void
 void print_move(Move *m);
+
+// @brief Displays all relevant pokemon information on screen
+// @params p Pokemon to be displayed
+// @return void
+void print_pokemon(Pokemon *p);
 
 #endif
