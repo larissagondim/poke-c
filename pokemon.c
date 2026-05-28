@@ -10,68 +10,78 @@
 
 int attack_pokemon(Pokemon *attacker, Pokemon *defender, Move *move) {
 
-    if(attacker == NULL) {
+    if (attacker == NULL) {
         printf("\nNo registered attacker.");
         return -1;
     }
 
-    if(defender == NULL) {
+    if (defender == NULL) {
         printf("\nNo registered defender.");
         return -1;
     }
 
-    /*TODO: use attacker's move*/
-    if(chance_hit(move->precision)) {
-
-        if(move->PP > 0) {
-        
-            move->PP -= 1;
-            int damage;
-
-            if(move->category == PHYSICAL) 
-                damage = (move->power * attacker->attack) / defender -> defense;
-
-            else if(move->category == SPECIAL)
-                damage = (move->power * attacker->sp_atk) / defender -> sp_def;
-            // if it isn't special or physical, it causes no damage
-            else
-                return 0;
-            
-            defender->hp -= damage;
-
-            if(defender->hp < 0) 
-                defender->hp = 0;
-
-            printf("\n%s used %s!", attacker->name, move->name);
-
-            return 1;
-        }
-        else {
-            printf("\nNo moves left.");
-            return -2;
-        }
-
-    } else {
-
-        printf("\nThe attack missed!");
-        return 0;
-
+    if (move == NULL) {
+        printf("\nNo move selected.");
+        return -1;
     }
+
+    if (move->PP <= 0) {
+        printf("\nNo moves left.");
+        return -2;
+    }
+
+    if (!chance_hit(move->precision)) {
+        printf("\nThe attack missed!");
+        move->PP -= 1;
+        return 0;
+    }
+
+    move->PP -= 1;
+    int damage = 0;
+
+    if (move->category == PHYSICAL) 
+        damage = (move->power * attacker->attack) / defender->defense;
+    else if (move->category == SPECIAL) 
+        damage = (move->power * attacker->sp_atk) / defender->sp_def;
+    else {
+        printf("\n%s used %s!\n", attacker->name, move->name);
+        printf("This move has no damage effect.\n");
+        return 0;
+    }
+
+    float multiplier = calculate_type_multiplier(move->type, defender->types);
+    damage = (int)(damage * multiplier + 0.5f);
+
+    defender->hp -= damage;
+    if (defender->hp < 0)
+        defender->hp = 0;
+
+    printf("\n%s used %s!", attacker->name, move->name);
+
+    if (multiplier == 0.0f) 
+        printf(" It had no effect!\n");
+    else if (multiplier > 1.0f) 
+        printf(" It's super effective!\n");
+    else if (multiplier < 1.0f) 
+        printf(" It's not very effective...\n");
+
+    return 1;
 }
 
 int chance_hit(float chance) {
 
     // if there's 0 chance of hitting, it will always return 0
-    if(chance <= 0.0f)
+    if (chance <= 0.0f)
         return 0;
 
     // if there's 100% chance of hitting, it will always return 1
-    if(chance >= 1.0f)
+    if (chance >= 100.0f)
         return 1;
 
+    float adjusted_chance = chance / 100.0f;
     float roll = rand() / (RAND_MAX + 1.0);
 
-    return roll < chance;
+    return roll < adjusted_chance;
 }
 
 Move create_move(
@@ -178,6 +188,10 @@ void print_move(Move *m) {
 
     switch (m->type) {
 
+        case NORMAL:
+            printf("Normal");
+            break;
+
         case FIRE:
             printf("Fire");
             break;
@@ -194,8 +208,56 @@ void print_move(Move *m) {
             printf("Electric");
             break;
 
-        case NORMAL:
-            printf("Normal");
+        case ICE:
+            printf("Ice");
+            break;
+
+        case FIGHTING:
+            printf("Fighting");
+            break;
+
+        case POISON:
+            printf("Poison");
+            break;
+
+        case GROUND:
+            printf("Ground");
+            break;
+
+        case FLYING:
+            printf("Flying");
+            break;
+
+        case PSYCHIC:
+            printf("Psychic");
+            break;
+
+        case BUG:
+            printf("Bug");
+            break;
+
+        case ROCK:
+            printf("Rock");
+            break;
+
+        case GHOST:
+            printf("Ghost");
+            break;
+
+        case DRAGON:
+            printf("Dragon");
+            break;
+
+        case DARK:
+            printf("Dark");
+            break;
+
+        case STEEL:
+            printf("Steel");
+            break;
+
+        case FAIRY:
+            printf("Fairy");
             break;
 
         default:

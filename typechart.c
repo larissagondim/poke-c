@@ -1,14 +1,78 @@
+#include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 #include "typechart.h"
 #include "pokemon.h"
 
 // type effectiveness chart
 // [ATTACKING_TYPE][DEFENDING_TYPE]
 float type_chart[TYPE_COUNT][TYPE_COUNT];
+static int chart_initialized = 0;
 
-// function content
-// 'init_type_chart'
-void init_type_chart(float type_chart[TYPE_COUNT][TYPE_COUNT]) {
+static void ensure_chart_initialized(void) {
+    if (!chart_initialized) {
+        init_type_chart();
+    }
+}
+
+static int strings_equal_ignore_case(const char *a, const char *b) {
+    if (a == NULL || b == NULL) return 0;
+    while (*a != '\0' && *b != '\0') {
+        if (tolower((unsigned char)*a) != tolower((unsigned char)*b))
+            return 0;
+        a++;
+        b++;
+    }
+    return *a == '\0' && *b == '\0';
+}
+
+static int parse_pokemon_type(const char type_name[]) {
+    if (type_name == NULL || type_name[0] == '\0')
+        return -1;
+
+    if (strings_equal_ignore_case(type_name, "Normal")) return NORMAL;
+    if (strings_equal_ignore_case(type_name, "Fire")) return FIRE;
+    if (strings_equal_ignore_case(type_name, "Water")) return WATER;
+    if (strings_equal_ignore_case(type_name, "Grass")) return GRASS;
+    if (strings_equal_ignore_case(type_name, "Electric")) return ELECTRIC;
+    if (strings_equal_ignore_case(type_name, "Ice")) return ICE;
+    if (strings_equal_ignore_case(type_name, "Fighting")) return FIGHTING;
+    if (strings_equal_ignore_case(type_name, "Poison")) return POISON;
+    if (strings_equal_ignore_case(type_name, "Ground")) return GROUND;
+    if (strings_equal_ignore_case(type_name, "Flying")) return FLYING;
+    if (strings_equal_ignore_case(type_name, "Psychic")) return PSYCHIC;
+    if (strings_equal_ignore_case(type_name, "Bug")) return BUG;
+    if (strings_equal_ignore_case(type_name, "Rock")) return ROCK;
+    if (strings_equal_ignore_case(type_name, "Ghost")) return GHOST;
+    if (strings_equal_ignore_case(type_name, "Dragon")) return DRAGON;
+    if (strings_equal_ignore_case(type_name, "Dark")) return DARK;
+    if (strings_equal_ignore_case(type_name, "Steel")) return STEEL;
+    if (strings_equal_ignore_case(type_name, "Fairy")) return FAIRY;
+
+    return -1;
+}
+
+float calculate_type_multiplier(PokemonType attack_type, char defender_types[MAX_TYPES][SIZE]) {
+    ensure_chart_initialized();
+
+    if (attack_type < 0 || attack_type >= TYPE_COUNT)
+        return 1.0f;
+
+    float multiplier = 1.0f;
+
+    for (int i = 0; i < MAX_TYPES; i++) {
+        if (defender_types[i][0] == '\0')
+            continue;
+
+        int defender_type = parse_pokemon_type(defender_types[i]);
+        if (defender_type >= 0 && defender_type < TYPE_COUNT)
+            multiplier *= type_chart[attack_type][defender_type];
+    }
+
+    return multiplier;
+}
+
+static void init_type_chart_table(float type_chart[TYPE_COUNT][TYPE_COUNT]) {
     // initializing everything as neutral damage
     for (int i = 0; i < TYPE_COUNT; i++) {
         for (int j = 0; j < TYPE_COUNT; j++) 
@@ -194,4 +258,9 @@ void init_type_chart(float type_chart[TYPE_COUNT][TYPE_COUNT]) {
     type_chart[FAIRY][FIRE] = 0.5;
     type_chart[FAIRY][POISON] = 0.5;
     type_chart[FAIRY][STEEL] = 0.5;
+}
+
+void init_type_chart(void) {
+    init_type_chart_table(type_chart);
+    chart_initialized = 1;
 }
