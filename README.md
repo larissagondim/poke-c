@@ -14,6 +14,8 @@ This project simulates Pokémon data structures and basic battle-related entitie
 * Move constructors
 * Pokémon information display
 * Move information display
+* Type effectiveness calculation using a type chart
+* Attack damage adjusted by defending Pokémon types
 * Organized modular architecture using ADTs
 * Practice with:
 
@@ -35,6 +37,7 @@ poke-c/
 ├── pokemon.c       # function implementations
 ├── typechart.h     # type definitions
 ├── typechart.c     # type chart logic
+├── test_typechart.c # battle/test scenarios with type effectiveness
 └── README.md
 ```
 
@@ -121,6 +124,18 @@ Run:
 ./pokemon
 ```
 
+Compile the typechart battle test:
+
+```bash
+gcc test_typechart.c pokemon.c typechart.c -o test_typechart
+```
+
+Run the battle test:
+
+```bash
+./test_typechart
+```
+
 ---
 
 ## Concepts Practiced
@@ -138,10 +153,9 @@ Run:
 
 ## Future Improvements
 
-* Battle system
-* Damage calculation
-* Type effectiveness
-* Status conditions
+* Battle system enhancements
+* More complete damage formula
+* Item effects and status conditions
 * Pokémon evolution system
 * Random encounters
 * Save/load system
