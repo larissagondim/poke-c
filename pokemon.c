@@ -334,3 +334,19 @@ void print_pokemon(Pokemon *p) {
             printf("\n");
     }
 }
+
+int run_turn(Pokemon *a, Pokemon *b, Move *move_a, Move *move_b) {
+    Pokemon *first  = (a->speed >= b->speed) ? a : b;
+    Pokemon *second = (a->speed >= b->speed) ? b : a;
+    Move *move_first  = (a->speed >= b->speed) ? move_a : move_b;
+    Move *move_second = (a->speed >= b->speed) ? move_b : move_a;
+
+    attack_pokemon(first, second, move_first);
+
+    if (is_alive(second) > 0)
+        attack_pokemon(second, first, move_second);
+
+    if (a->hp <= 0 && b->hp > 0) return -1; 
+    if (b->hp <= 0 && a->hp > 0) return  1; 
+    return 0; 
+}

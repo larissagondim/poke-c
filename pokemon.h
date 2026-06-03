@@ -144,4 +144,12 @@ void print_move(Move *m);
 // @return void
 void print_pokemon(Pokemon *p);
 
+// @brief Runs a turn of battle based on its speed
+// @param a 1st pokemon that'll be used
+// @param b 2nd pokemon
+// @param move_a 1st pokemon's move
+// @param move_b 2nd pokemon's move
+// @return 1 if the 1st pokemon won, -1 if the 2nd pokemon won, 0 if it's a tie or if no pokemon fainted
+int run_turn(Pokemon *a, Pokemon *b, Move *move_a, Move *move_b);
+
 #endif
