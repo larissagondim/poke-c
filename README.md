@@ -2,20 +2,20 @@
 
 A simple Pokémon Abstract Data Type (ADT) project written in C.
 
-This project simulates Pokémon data structures and basic battle-related entities using modular programming with `.h` and `.c` files.
+This project simulates Pokémon data structures and battle mechanics using modular programming with `.h` and `.c` files.
 
 ---
 
 ## Features
 
-* Pokémon structure representation
-* Move structure representation
-* Pokémon constructors
-* Move constructors
-* Pokémon information display
-* Move information display
-* Type effectiveness calculation using a type chart
-* Attack damage adjusted by defending Pokémon types
+* Pokémon and Move structure representation
+* Pokémon and Move constructors
+* Pokémon and Move information display
+* Type effectiveness chart (18 types, full matrix)
+* Attack damage adjusted by move category (Physical/Special/Status) and defending Pokémon types
+* Speed-based turn priority: the faster Pokémon attacks first
+* Fainted Pokémon cannot attack (`is_alive` check)
+* Hit chance system based on move accuracy
 * Organized modular architecture using ADTs
 * Practice with:
 
@@ -32,12 +32,13 @@ This project simulates Pokémon data structures and basic battle-related entitie
 ```txt
 poke-c/
 │
-├── main.c          # project testing
-├── pokemon.h       # structs, constants, prototypes
-├── pokemon.c       # function implementations
-├── typechart.h     # type definitions
-├── typechart.c     # type chart logic
-├── test_typechart.c # battle/test scenarios with type effectiveness
+├── main.c             # basic Pokémon/Move creation and display test
+├── pokemon.h          # structs, constants, enums, prototypes
+├── pokemon.c          # function implementations
+├── typechart.h        # type chart prototypes
+├── typechart.c        # type chart initialization and multiplier logic
+├── test_typechart.c   # battle/test scenarios with type effectiveness and speed priority
+├── .gitignore
 └── README.md
 ```
 
@@ -76,7 +77,7 @@ typedef struct {
 typedef struct {
     char name[NAME_SIZE];
     PokemonType type;
-    MoveCategory category;
+    MoveCategory category; // PHYSICAL, SPECIAL or STATUS
 
     int power;
     int PP;
@@ -86,7 +87,73 @@ typedef struct {
 
 ---
 
+## Available Functions
+
+### `pokemon.h` / `pokemon.c`
+
+| Function | Description |
+|---|---|
+| `create_pokemon(...)` | Creates and initializes a Pokémon structure |
+| `create_move(...)` | Creates and initializes a Move structure |
+| `attack_pokemon(attacker, defender, move)` | Executes an attack, applying damage based on category, stats, and type effectiveness |
+| `run_turn(a, b, move_a, move_b)` | Simulates a full turn: compares speed to decide attack order, prevents fainted Pokémon from attacking |
+| `is_alive(p)` | Checks if a Pokémon still has HP > 0 |
+| `chance_hit(chance)` | Returns whether an attack hits based on its accuracy |
+| `print_pokemon(p)` | Displays all Pokémon information |
+| `print_move(m)` | Displays all Move information |
+
+### `typechart.h` / `typechart.c`
+
+| Function | Description |
+|---|---|
+| `init_type_chart()` | Initializes the 18×18 type effectiveness matrix |
+| `calculate_type_multiplier(attack_type, defender_types)` | Returns the damage multiplier (0.0, 0.5, 1.0, 2.0, 4.0) based on type matchups |
+
+---
+
+## Battle Mechanics
+
+### Damage Calculation
+
+```
+Physical:  damage = (move.power × attacker.attack)  / defender.defense
+Special:   damage = (move.power × attacker.sp_atk)  / defender.sp_def
+Status:    no damage
+```
+
+The damage is then multiplied by the type effectiveness multiplier.
+
+### Type Effectiveness
+
+| Multiplier | Message |
+|---|---|
+| 0.0× | "It had no effect!" |
+| 0.5× | "It's not very effective..." |
+| 1.0× | *(neutral, no message)* |
+| 2.0× | "It's super effective!" |
+| 4.0× | "It's super effective!" (dual-type weakness) |
+
+### Speed Priority (`run_turn`)
+
+```
+run_turn(&pikachu, &gyarados, &thunderbolt, &waterfall)
+       │
+       ├─ pikachu.speed (90) > gyarados.speed (81)?  → Pikachu goes first
+       │
+       ├─ attack_pokemon(&pikachu, &gyarados, &thunderbolt)
+       │
+       ├─ is_alive(&gyarados)?  → if yes:
+       │
+       └─ attack_pokemon(&gyarados, &pikachu, &waterfall)
+```
+
+Returns `1` if Pokémon A won, `-1` if B won, `0` if neither fainted.
+
+---
+
 ## Example Output
+
+### Pokémon Info (`main.c`)
 
 ```txt
 No. 025 | Pikachu (♀)
@@ -103,36 +170,37 @@ Height: 40.00 cm
 Weight: 6.00 kg
 
 MOVES:
+Thunderbolt         Quick Attack
+Iron Tail           Electro Ball
+```
 
-Thunderbolt        Quick Attack
-Iron Tail          Electro Ball
+### Speed Priority Battle (`test_typechart.c`)
+
+```txt
+Speed: Pikachu=90 | Gyarados=81
+
+Pikachu used Thunderbolt! It's super effective!
+
+Gyarados has fainted!
+Resultado final -> Pikachu HP:35 | Gyarados HP:0
+Vencedor: Pikachu
 ```
 
 ---
 
 ## Compilation
 
-Compile the project using GCC:
+Compile and run the main test:
 
 ```bash
 gcc main.c pokemon.c typechart.c -o pokemon
-```
-
-Run:
-
-```bash
 ./pokemon
 ```
 
-Compile the typechart battle test:
+Compile and run the battle tests (type chart + speed priority):
 
 ```bash
 gcc test_typechart.c pokemon.c typechart.c -o test_typechart
-```
-
-Run the battle test:
-
-```bash
 ./test_typechart
 ```
 
@@ -147,23 +215,28 @@ Run the battle test:
 * Arrays of structs
 * String manipulation with `strcpy`
 * Pointers and memory access
+* Enum usage for types and categories
+* Conditional logic for game mechanics
 * Clean project organization
 
 ---
 
 ## Future Improvements
 
-* Battle system enhancements
-* More complete damage formula
-* Item effects and status conditions
+* STAB (Same-Type Attack Bonus)
+* Critical hit system
+* Status conditions (burn, paralyze, poison, sleep, freeze)
+* Stat stages (−6 to +6 modifiers)
+* Full battle loop (multiple turns until one side faints)
+* Team battles (3v3 or 6v6)
+* Trainer structure
+* Reading Pokémon data from files
 * Pokémon evolution system
-* Random encounters
 * Save/load system
-* Dynamic move learning
 
 ---
 
 ## Author
-Larissa Vilasboas Gondim | `@larissagondim`on github
+Larissa Vilasboas Gondim | `@larissagondim` on github
 
 Developed for programming and ADT practice in C.
