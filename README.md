@@ -38,6 +38,7 @@ poke-c/
 ├── typechart.h        # type chart prototypes
 ├── typechart.c        # type chart initialization and multiplier logic
 ├── test_typechart.c   # battle/test scenarios with type effectiveness and speed priority
+├── Makefile           # build rules for all targets
 ├── .gitignore
 └── README.md
 ```
@@ -190,19 +191,38 @@ Vencedor: Pikachu
 
 ## Compilation
 
-Compile and run the main test:
+The project includes a `Makefile` to simplify building and running.
+
+| Command | Description |
+|---|---|
+| `make` | Compiles the main binary (`poke`) |
+| `make run` | Compiles and runs the main program |
+| `make test` | Compiles and runs the battle test suite |
+| `make clean` | Removes all generated binaries |
+
+### Build and run the main program
 
 ```bash
-gcc main.c pokemon.c typechart.c -o pokemon
-./pokemon
+make run
 ```
 
-Compile and run the battle tests (type chart + speed priority):
+### Build and run the tests
 
 ```bash
-gcc test_typechart.c pokemon.c typechart.c -o test_typechart
-./test_typechart
+make test
 ```
+
+### Clean up
+
+```bash
+make clean
+```
+
+> **Manual compilation** (without Make):
+> ```bash
+> gcc -Wall -Wextra -std=c11 main.c pokemon.c typechart.c -o poke
+> gcc -Wall -Wextra -std=c11 test_typechart.c pokemon.c typechart.c -o test_typechart
+> ```
 
 ---
 
