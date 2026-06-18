@@ -20,6 +20,6 @@ void init_type_chart(void);
 // @params attack_type: pokem'ons type
 // @params defender_type: the defender type
 // @return a float value that represents the damage multiplier
-float calculate_type_multiplier(PokemonType attack_type, char defender_types[MAX_TYPES][SIZE]);
+float calculate_type_multiplier(PokemonType attack_type, PokemonType defender_types[MAX_TYPES]);
 
 #endif

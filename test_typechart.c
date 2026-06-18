@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "pokemon.h"
 #include "typechart.h"
@@ -32,14 +33,14 @@ static void run_attack(Pokemon *attacker, Pokemon *defender, Move *move) {
 int main() {
     srand(0);
 
-    char pikachu_types[MAX_TYPES][SIZE] = {"Electric", ""};
-    char charmander_types[MAX_TYPES][SIZE] = {"Fire", ""};
-    char bulbasaur_types[MAX_TYPES][SIZE] = {"Grass", "Poison"};
-    char gyarados_types[MAX_TYPES][SIZE] = {"Water", "Flying"};
-    char metagross_types[MAX_TYPES][SIZE] = {"Steel", "Psychic"};
-    char snorlax_types[MAX_TYPES][SIZE] = {"Normal", ""};
-    char salamence_types[MAX_TYPES][SIZE] = {"Dragon", "Flying"};
-    char clefairy_types[MAX_TYPES][SIZE] = {"Fairy", ""};
+    PokemonType pikachu_types[MAX_TYPES] = {ELECTRIC, NONE_TYPE};
+    PokemonType charmander_types[MAX_TYPES] = {FIRE, NONE_TYPE};
+    PokemonType bulbasaur_types[MAX_TYPES] = {GRASS, POISON};
+    PokemonType gyarados_types[MAX_TYPES] = {WATER, FLYING};
+    PokemonType metagross_types[MAX_TYPES] = {STEEL, PSYCHIC};
+    PokemonType snorlax_types[MAX_TYPES] = {NORMAL, NONE_TYPE};
+    PokemonType salamence_types[MAX_TYPES] = {DRAGON, FLYING};
+    PokemonType clefairy_types[MAX_TYPES] = {FAIRY, NONE_TYPE};
 
     Pokemon pikachu = create_pokemon("Pikachu", pikachu_types, 'F', 25, 18, 35, 55, 40, 50, 50, 90, 40.0, 6.0);
     Pokemon charmander = create_pokemon("Charmander", charmander_types, 'M', 4, 12, 39, 52, 43, 60, 50, 65, 60.0, 8.5);
@@ -84,9 +85,7 @@ int main() {
     printf("Speed: %s=%d | %s=%d\n", pk1.name, pk1.speed, gy1.name, gy1.speed);
     int res1 = run_turn(&pk1, &gy1, &tb1, &wf1);
     printf("Final results -> %s HP:%d | %s HP:%d\n", pk1.name, pk1.hp, gy1.name, gy1.hp);
-    if (res1 == 1)  printf("Winner: %s\n", pk1.name);
-    if (res1 == -1) printf("Winner: %s\n", gy1.name);
-    if (res1 == 0)  printf("Nenhum desmaiou no turno.\n");
+    assert(res1 == -1); // Gyarados wins
 
     printf("\n2nd test: tie and both swap attacks\n");
     Pokemon sal2 = create_pokemon("Salamence", salamence_types, 'M', 373, 50, 95, 135, 80, 110, 105, 100, 1500.0, 102.6);
@@ -96,9 +95,7 @@ int main() {
     printf("Speed: %s=%d | %s=%d\n", sal2.name, sal2.speed, snx2.name, snx2.speed);
     int res2 = run_turn(&sal2, &snx2, &og2, &bs2);
     printf("Final results -> %s HP:%d | %s HP:%d\n", sal2.name, sal2.hp, snx2.name, snx2.hp);
-    if (res2 == 1)  printf("Winner: %s\n", sal2.name);
-    if (res2 == -1) printf("Winner: %s\n", snx2.name);
-    if (res2 == 0)  printf("None has fainted in this turn.\n");
+    assert(res2 == 0); // None faints
 
     printf("\n3rd test: charmander b4 bulbassaur\n");
     Pokemon ch3 = create_pokemon("Charmander", charmander_types, 'M', 4, 12, 39, 52, 43, 60, 50, 65, 60.0, 8.5);
@@ -108,9 +105,9 @@ int main() {
     printf("Speed: %s=%d | %s=%d\n", ch3.name, ch3.speed, bul3.name, bul3.speed);
     int res3 = run_turn(&ch3, &bul3, &em3, &vw3);
     printf("Final result -> %s HP:%d | %s HP:%d\n", ch3.name, ch3.hp, bul3.name, bul3.hp);
-    if (res3 == 1)  printf("Winner: %s\n", ch3.name);
-    if (res3 == -1) printf("Winner: %s\n", bul3.name);
-    if (res3 == 0)  printf("None has fainted in this turn.\n");
+    assert(res3 == 0); // None faints
+
+    printf("\nAll tests passed!\n");
 
     return 0;
 }

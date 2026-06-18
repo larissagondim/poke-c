@@ -42,8 +42,17 @@ typedef enum {
     DRAGON,
     DARK,
     STEEL,
-    FAIRY
+    FAIRY,
+    NONE_TYPE
 } PokemonType;
+
+// Pokemon status conditions
+typedef enum {
+    STATUS_NONE,
+    STATUS_BURN,
+    STATUS_POISON,
+    STATUS_PARALYSIS
+} StatusCondition;
 
 // STRUCTURES: 
 
@@ -62,12 +71,14 @@ typedef struct {
 // Structure that represents basic pokemon stats that will simulate its battle dynamics
 typedef struct {
     char name[SIZE];
-    char types[MAX_TYPES][SIZE]; // pokemon type(s) (e.g. fire and flying)
+    PokemonType types[MAX_TYPES]; // pokemon type(s)
     char sex; // F for Female | M for male
     Move moves[MAX_MOVES]; // list of moves the pokemon can use
     int pokedex_code; // national pokédex identification number
     int level; // current pokemon level
     int hp; // health points
+    int max_hp; // maximum health points
+    StatusCondition status; // current status condition
     int speed; // determines attack order in battle
     int attack; // physical attack stat
     int defense; // physical defense stat
@@ -113,7 +124,7 @@ Move create_move(
 // @return A fully initialized Pokemon structure
 Pokemon create_pokemon(
     char name[],
-    char types[MAX_TYPES][SIZE],
+    PokemonType types[MAX_TYPES],
     char sex,
     int pokedex_code,
     int level,
@@ -151,5 +162,10 @@ void print_pokemon(Pokemon *p);
 // @param move_b 2nd pokemon's move
 // @return 1 if the 1st pokemon won, -1 if the 2nd pokemon won, 0 if it's a tie or if no pokemon fainted
 int run_turn(Pokemon *a, Pokemon *b, Move *move_a, Move *move_b);
+
+// @brief Runs a battle loop between two pokemons until one faints
+// @param a 1st pokemon
+// @param b 2nd pokemon
+void run_battle(Pokemon *a, Pokemon *b);
 
 #endif

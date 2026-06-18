@@ -2,14 +2,15 @@
 #include <string.h>
 
 #include "pokemon.h"
+#include "typechart.h"
 
 // TESTING FUNCTIONS
 int main() {
 
     // pokemon types
-    char pikachu_types[MAX_TYPES][SIZE] = {
-        "Electric",
-        ""
+    PokemonType pikachu_types[MAX_TYPES] = {
+        ELECTRIC,
+        NONE_TYPE
     };
 
     // create pokemon
@@ -78,6 +79,33 @@ int main() {
     // display move info
     printf("\n");
     print_move(&pikachu.moves[0]);
+
+    // create second pokemon
+    PokemonType charmander_types[MAX_TYPES] = {
+        FIRE,
+        NONE_TYPE
+    };
+    Pokemon charmander = create_pokemon(
+        "Charmander",
+        charmander_types,
+        'M',
+        4,
+        18,
+        39,
+        52,
+        43,
+        60,
+        50,
+        65,
+        60.0,
+        8.5
+    );
+    Move ember = create_move("Ember", FIRE, SPECIAL, 40, 25, 100.0);
+    charmander.moves[0] = ember;
+
+    // run battle
+    init_type_chart();
+    run_battle(&pikachu, &charmander);
 
     return 0;
 }

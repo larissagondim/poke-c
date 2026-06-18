@@ -15,44 +15,7 @@ static void ensure_chart_initialized(void) {
     }
 }
 
-static int strings_equal_ignore_case(const char *a, const char *b) {
-    if (a == NULL || b == NULL) return 0;
-    while (*a != '\0' && *b != '\0') {
-        if (tolower((unsigned char)*a) != tolower((unsigned char)*b))
-            return 0;
-        a++;
-        b++;
-    }
-    return *a == '\0' && *b == '\0';
-}
-
-static int parse_pokemon_type(const char type_name[]) {
-    if (type_name == NULL || type_name[0] == '\0')
-        return -1;
-
-    if (strings_equal_ignore_case(type_name, "Normal")) return NORMAL;
-    if (strings_equal_ignore_case(type_name, "Fire")) return FIRE;
-    if (strings_equal_ignore_case(type_name, "Water")) return WATER;
-    if (strings_equal_ignore_case(type_name, "Grass")) return GRASS;
-    if (strings_equal_ignore_case(type_name, "Electric")) return ELECTRIC;
-    if (strings_equal_ignore_case(type_name, "Ice")) return ICE;
-    if (strings_equal_ignore_case(type_name, "Fighting")) return FIGHTING;
-    if (strings_equal_ignore_case(type_name, "Poison")) return POISON;
-    if (strings_equal_ignore_case(type_name, "Ground")) return GROUND;
-    if (strings_equal_ignore_case(type_name, "Flying")) return FLYING;
-    if (strings_equal_ignore_case(type_name, "Psychic")) return PSYCHIC;
-    if (strings_equal_ignore_case(type_name, "Bug")) return BUG;
-    if (strings_equal_ignore_case(type_name, "Rock")) return ROCK;
-    if (strings_equal_ignore_case(type_name, "Ghost")) return GHOST;
-    if (strings_equal_ignore_case(type_name, "Dragon")) return DRAGON;
-    if (strings_equal_ignore_case(type_name, "Dark")) return DARK;
-    if (strings_equal_ignore_case(type_name, "Steel")) return STEEL;
-    if (strings_equal_ignore_case(type_name, "Fairy")) return FAIRY;
-
-    return -1;
-}
-
-float calculate_type_multiplier(PokemonType attack_type, char defender_types[MAX_TYPES][SIZE]) {
+float calculate_type_multiplier(PokemonType attack_type, PokemonType defender_types[MAX_TYPES]) {
     ensure_chart_initialized();
 
     if (attack_type < 0 || attack_type >= TYPE_COUNT)
@@ -61,10 +24,10 @@ float calculate_type_multiplier(PokemonType attack_type, char defender_types[MAX
     float multiplier = 1.0f;
 
     for (int i = 0; i < MAX_TYPES; i++) {
-        if (defender_types[i][0] == '\0')
+        if (defender_types[i] == NONE_TYPE)
             continue;
 
-        int defender_type = parse_pokemon_type(defender_types[i]);
+        int defender_type = defender_types[i];
         if (defender_type >= 0 && defender_type < TYPE_COUNT)
             multiplier *= type_chart[attack_type][defender_type];
     }
