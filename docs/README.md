@@ -2,7 +2,7 @@
 
 A simple Pokémon Abstract Data Type (ADT) project written in C.
 
-This project simulates Pokémon data structures and battle mechanics using modular programming with `.h` and `.c` files.
+This project simulates Pokémon data structures and battle mechanics using modular programming with `.h` and `.c` files, organized into a standard C project structure.
 
 ---
 
@@ -32,17 +32,22 @@ This project simulates Pokémon data structures and battle mechanics using modul
 ```txt
 poke-c/
 │
-├── main.c             # basic Pokémon/Move creation and display test
-├── pokemon.h          # structs, constants, enums, prototypes
-├── pokemon.c          # function implementations
-├── typechart.h        # type chart prototypes
-├── typechart.c        # type chart initialization and multiplier logic
-├── test_typechart.c   # battle/test scenarios with type effectiveness and speed priority
-├── Makefile           # build rules for all targets
+├── include/                 # Header files
+│   ├── pokemon.h            # structs, constants, enums, prototypes
+│   └── typechart.h          # type chart prototypes
+│
+├── src/                     # Source files
+│   ├── main.c               # basic Pokémon/Move creation and display test
+│   ├── pokemon.c            # function implementations
+│   └── typechart.c          # type chart initialization and multiplier logic
+│
+├── test/                    # Test files
+│   └── test_typechart.c     # battle/test scenarios with type effectiveness and speed priority
+│
+├── Makefile                 # build rules for all targets
 ├── .gitignore
 └── README.md
 ```
-
 ---
 
 ## Pokémon Structure
@@ -50,24 +55,23 @@ poke-c/
 ```c
 typedef struct {
     char name[NAME_SIZE];
-    char types[MAX_TYPES][SIZE];
-    char sex;
-
-    Move moves[MAX_MOVES];
-
-    int pokedex_code;
-    int level;
-
-    int hp;
-    int speed;
-    int attack;
-    int defense;
-    int sp_atk;
-    int sp_def;
-
+    PokemonType types[MAX_TYPES];
+    char sex; 
+    Move moves[MAX_MOVES]; 
+    int pokedex_code; 
+    int level; 
+    int hp; 
+    int max_hp; 
+    StatusCondition status; 
+    int speed; 
+    int attack;   
+    int defense; 
+    int sp_atk; 
+    int sp_def; 
     double weight;
     double height;
 } Pokemon;
+
 ```
 
 ---
@@ -78,11 +82,10 @@ typedef struct {
 typedef struct {
     char name[NAME_SIZE];
     PokemonType type;
-    MoveCategory category; // PHYSICAL, SPECIAL or STATUS
-
-    int power;
-    int PP;
-    float precision;
+    MoveCategory category;
+    int power;  
+    int PP; 
+    float precision;  
 } Move;
 ```
 
@@ -90,26 +93,19 @@ typedef struct {
 
 ## Available Functions
 
-### `pokemon.h` / `pokemon.c`
+### `include/pokemon.h` / `src/pokemon.c`
 
 | Function | Description |
 |---|---|
-| `create_pokemon(...)` | Creates and initializes a Pokémon structure |
-| `create_move(...)` | Creates and initializes a Move structure |
-| `attack_pokemon(attacker, defender, move)` | Executes an attack, applying damage based on category, stats, and type effectiveness |
-| `run_turn(a, b, move_a, move_b)` | Simulates a full turn: compares speed to decide attack order, prevents fainted Pokémon from attacking |
-| `is_alive(p)` | Checks if a Pokémon still has HP > 0 |
-| `chance_hit(chance)` | Returns whether an attack hits based on its accuracy |
-| `print_pokemon(p)` | Displays all Pokémon information |
-| `print_move(m)` | Displays all Move information |
-
-### `typechart.h` / `typechart.c`
-
-| Function | Description |
-|---|---|
-| `init_type_chart()` | Initializes the 18×18 type effectiveness matrix |
-| `calculate_type_multiplier(attack_type, defender_types)` | Returns the damage multiplier (0.0, 0.5, 1.0, 2.0, 4.0) based on type matchups |
-
+| `create_pokemon(...)` | Creates and initializes a Pokemon structure with its basic attributes. |
+| `create_move(...)` | Creates and initializes a Move structure. |
+| `attack_pokemon(attacker, defender, move)` | Simulates an attack. Returns `1` if it hits, `0` if it misses/no damage, `-1` for invalid pointers, or `-2` for no PP. |
+| `run_turn(a, b, move_a, move_b)` | Runs a single turn: compares speed to decide attack order. Returns `1` if Pokémon A won, `-1` if B won, `0` for tie/no faints. |
+| `run_battle(a, b)` | Runs a continuous battle loop between two pokémons until one of them faints. |
+| `is_alive(p)` | Checks if a Pokémon is still alive (HP > 0). Returns `1` if alive, `0` if fainted, `-1` if pointer is invalid. |
+| `chance_hit(chance)` | Calculates hit probability based on move accuracy. Returns `1` if the attack hits, otherwise `0`. |
+| `print_pokemon(p)` | Displays all relevant Pokémon stats, types, and moves on the screen. |
+| `print_move(m)` | Displays all relevant Move information (power, PP, accuracy, etc.) on the screen. |
 ---
 
 ## Battle Mechanics
