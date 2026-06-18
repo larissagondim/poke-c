@@ -1,28 +1,22 @@
-CC      = gcc
-CFLAGS  = -Wall -Wextra -std=c11 -g
-SRC     = pokemon.c typechart.c
-HEADERS = pokemon.h typechart.h
+CC = gcc
+CFLAGS = -Wall -Wextra -Iinclude
 
-# binário principal
-TARGET  = poke
-# binário de testes
-TEST    = test_typechart
+SRC = $(wildcard src/*.c)
+TARGET = pokemon
 
 .PHONY: all run test clean
 
 all: $(TARGET)
 
-$(TARGET): main.c $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) main.c $(SRC) -o $(TARGET)
-
-$(TEST): test_typechart.c $(SRC) $(HEADERS)
-	$(CC) $(CFLAGS) test_typechart.c $(SRC) -o $(TEST)
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $^ -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
-test: $(TEST)
-	./$(TEST)
+test:
+	$(CC) $(CFLAGS) test/test_typechart.c src/typechart.c src/pokemon.c -o test_typechart
+	./test_typechart
 
 clean:
-	rm -f $(TARGET) $(TEST)
+	rm -f $(TARGET) test_typechart
