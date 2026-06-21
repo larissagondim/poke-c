@@ -76,7 +76,7 @@ typedef struct {
     Move moves[MAX_MOVES]; // list of moves the pokemon can use
     int pokedex_code; // national pokédex identification number
     int level; // current pokemon level
-    int hp; // health points
+    int current_hp; // health points
     int max_hp; // maximum health points
     StatusCondition status; // current status condition
     int speed; // determines attack order in battle

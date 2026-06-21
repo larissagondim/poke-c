@@ -239,7 +239,6 @@ make clean
 
 ## Future Improvements
 
-* STAB (Same-Type Attack Bonus)
 * Critical hit system
 * Status conditions (burn, paralyze, poison, sleep, freeze)
 * Stat stages (−6 to +6 modifiers)

@@ -11,9 +11,9 @@
 static void print_battle_state(Pokemon *attacker, Pokemon *defender, Move *move) {
     printf("\nBATTLE: \n");
     printf("%s (HP: %d) uses %s against %s (HP: %d)\n",
-           attacker->name, attacker->hp,
+           attacker->name, attacker->current_hp,
            move->name,
-           defender->name, defender->hp);
+           defender->name, defender->current_hp);
 }
 
 static void run_attack(Pokemon *attacker, Pokemon *defender, Move *move) {
@@ -27,7 +27,7 @@ static void run_attack(Pokemon *attacker, Pokemon *defender, Move *move) {
     else if (result == 0) 
         printf("No damage applied.\n");
     else 
-        printf("Results: %s is now with %d HP\n", defender->name, defender->hp);
+        printf("Results: %s is now with %d HP\n", defender->name, defender->current_hp);
 }
 
 int main() {
@@ -84,7 +84,7 @@ int main() {
     Move wf1 = create_move("Waterfall", WATER, PHYSICAL, 80, 5, 100.0);
     printf("Speed: %s=%d | %s=%d\n", pk1.name, pk1.speed, gy1.name, gy1.speed);
     int res1 = run_turn(&pk1, &gy1, &tb1, &wf1);
-    printf("Final results -> %s HP:%d | %s HP:%d\n", pk1.name, pk1.hp, gy1.name, gy1.hp);
+    printf("Final results -> %s HP:%d | %s HP:%d\n", pk1.name, pk1.current_hp, gy1.name, gy1.current_hp);
     assert(res1 == -1); // Gyarados wins
 
     printf("\n2nd test: tie and both swap attacks\n");
@@ -94,7 +94,7 @@ int main() {
     Move bs2 = create_move("Body Slam", NORMAL, PHYSICAL, 85, 15, 100.0);
     printf("Speed: %s=%d | %s=%d\n", sal2.name, sal2.speed, snx2.name, snx2.speed);
     int res2 = run_turn(&sal2, &snx2, &og2, &bs2);
-    printf("Final results -> %s HP:%d | %s HP:%d\n", sal2.name, sal2.hp, snx2.name, snx2.hp);
+    printf("Final results -> %s HP:%d | %s HP:%d\n", sal2.name, sal2.current_hp, snx2.name, snx2.current_hp);
     assert(res2 == 0); // None faints
 
     printf("\n3rd test: charmander b4 bulbassaur\n");
@@ -104,7 +104,7 @@ int main() {
     Move vw3 = create_move("Vine Whip", GRASS, PHYSICAL, 45, 25, 100.0);
     printf("Speed: %s=%d | %s=%d\n", ch3.name, ch3.speed, bul3.name, bul3.speed);
     int res3 = run_turn(&ch3, &bul3, &em3, &vw3);
-    printf("Final result -> %s HP:%d | %s HP:%d\n", ch3.name, ch3.hp, bul3.name, bul3.hp);
+    printf("Final result -> %s HP:%d | %s HP:%d\n", ch3.name, ch3.current_hp, bul3.name, bul3.current_hp);
     assert(res3 == 0); // None faints
 
     printf("\nAll tests passed!\n");

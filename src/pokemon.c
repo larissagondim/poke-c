@@ -99,9 +99,9 @@ int attack_pokemon(Pokemon *attacker, Pokemon *defender, Move *move) {
     float multiplier = calculate_type_multiplier(move->type, defender->types);
     damage = (int)(damage * multiplier + 0.5f);
 
-    defender->hp -= damage;
-    if (defender->hp < 0)
-        defender->hp = 0;
+    defender->current_hp -= damage;
+    if (defender->current_hp < 0)
+        defender->current_hp = 0;
 
     printf("\n%s used %s!", attacker->name, move->name);
 
@@ -183,7 +183,7 @@ Pokemon create_pokemon(
     p.pokedex_code = pokedex_code;
     p.level = level;
 
-    p.hp = hp;
+    p.current_hp = hp;
     p.max_hp = hp;
     p.status = STATUS_NONE;
 
@@ -213,7 +213,7 @@ int is_alive(Pokemon *p) {
         return -1;
     }
 
-    if(!(p->hp > 0)) {
+    if(!(p->current_hp > 0)) {
         printf("\n%s has fainted!", p->name);
         return 0;
     }
@@ -291,7 +291,7 @@ void print_pokemon(Pokemon *p) {
     else if (p->status == STATUS_POISON) printf("\nStatus: POISON");
     else if (p->status == STATUS_PARALYSIS) printf("\nStatus: PARALYSIS");
     
-    printf("\nHP: %d/%d", p->hp, p->max_hp);
+    printf("\nHP: %d/%d", p->current_hp, p->max_hp);
     printf("\nAttack: %d", p->attack);
     printf("\nDefense: %d", p->defense);
     printf("\nSp. Attack: %d", p->sp_atk);
@@ -313,20 +313,20 @@ void print_pokemon(Pokemon *p) {
 }
 
 static void apply_status_effects(Pokemon *p) {
-    if (p->hp > 0) {
+    if (p->current_hp > 0) {
         if (p->status == STATUS_BURN) {
             int damage = p->max_hp / 16;
             if (damage == 0) damage = 1;
-            p->hp -= damage;
+            p->current_hp -= damage;
             printf("\n%s is hurt by its burn!\n", p->name);
         } else if (p->status == STATUS_POISON) {
             int damage = p->max_hp / 8;
             if (damage == 0) damage = 1;
-            p->hp -= damage;
+            p->current_hp -= damage;
             printf("\n%s is hurt by poison!\n", p->name);
         }
-        if (p->hp < 0) p->hp = 0;
-        if (p->hp == 0) printf("\n%s has fainted!\n", p->name);
+        if (p->current_hp < 0) p->current_hp = 0;
+        if (p->current_hp == 0) printf("\n%s has fainted!\n", p->name);
     }
 }
 
@@ -345,8 +345,8 @@ int run_turn(Pokemon *a, Pokemon *b, Move *move_a, Move *move_b) {
     apply_status_effects(first);
     apply_status_effects(second);
 
-    if (a->hp <= 0 && b->hp > 0) return -1; 
-    if (b->hp <= 0 && a->hp > 0) return  1; 
+    if (a->current_hp <= 0 && b->current_hp > 0) return -1; 
+    if (b->current_hp <= 0 && a->current_hp > 0) return  1; 
     return 0; 
 }
 
@@ -354,7 +354,7 @@ void run_battle(Pokemon *a, Pokemon *b) {
     printf("\n--- BATTLE START ---");
     printf("\n%s vs %s\n", a->name, b->name);
     int turn = 1;
-    while (a->hp > 0 && b->hp > 0) {
+    while (a->current_hp > 0 && b->current_hp > 0) {
         printf("\n--- Turn %d ---\n", turn++);
         
         Move *move_a = &a->moves[rand() % MAX_MOVES];
@@ -369,9 +369,9 @@ void run_battle(Pokemon *a, Pokemon *b) {
         run_turn(a, b, move_a, move_b);
     }
     printf("\n--- BATTLE END ---\n");
-    if (a->hp > 0) {
+    if (a->current_hp > 0) {
         printf("\n%s wins!\n", a->name);
-    } else if (b->hp > 0) {
+    } else if (b->current_hp > 0) {
         printf("\n%s wins!\n", b->name);
     } else {
         printf("\nIt's a tie!\n");
