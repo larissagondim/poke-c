@@ -331,16 +331,22 @@ static void apply_status_effects(Pokemon *p) {
 }
 
 int run_turn(Pokemon *a, Pokemon *b, Move *move_a, Move *move_b) {
-    Pokemon *first  = (a->speed >= b->speed) ? a : b;
-    Pokemon *second = (a->speed >= b->speed) ? b : a;
-    Move *move_first  = (a->speed >= b->speed) ? move_a : move_b;
-    Move *move_second = (a->speed >= b->speed) ? move_b : move_a;
 
-    if (is_alive(first) > 0)
+    int speed_a = (a->status == STATUS_PARALYSIS) ? (a->speed / 2) : a->speed;
+    int speed_b = (b->status == STATUS_PARALYSIS) ? (b->speed / 2) : b->speed;
+
+    Pokemon *first  = (speed_a >= speed_b) ? a : b;
+    Pokemon *second = (speed_a >= speed_b) ? b : a;
+    Move *move_first  = (speed_a >= speed_b) ? move_a : move_b;
+    Move *move_second = (speed_a >= speed_b) ? move_b : move_a;
+
+    if (is_alive(first) > 0) 
         attack_pokemon(first, second, move_first);
+    
 
-    if (is_alive(second) > 0)
+    if (is_alive(second) > 0 && is_alive(first) > 0) 
         attack_pokemon(second, first, move_second);
+    
 
     apply_status_effects(first);
     apply_status_effects(second);
@@ -354,24 +360,60 @@ void run_battle(Pokemon *a, Pokemon *b) {
     printf("\n--- BATTLE START ---");
     printf("\n%s vs %s\n", a->name, b->name);
     int turn = 1;
+
     while (a->current_hp > 0 && b->current_hp > 0) {
         printf("\n--- Turn %d ---\n", turn++);
         
-        Move *move_a = &a->moves[rand() % MAX_MOVES];
-        while (move_a->name[0] == '\0' || move_a->PP <= 0) {
-            move_a = &a->moves[rand() % MAX_MOVES];
+        // seleção controlada para o pokémon a
+        Move *move_a = NULL;
+        int valid_moves_a[MAX_MOVES];
+        int count_a = 0;
+
+        for (int i = 0; i < MAX_MOVES; i++) {
+            if (a->moves[i].name[0] != '\0' && a->moves[i].PP > 0) {
+                valid_moves_a[count_a] = i;
+                count_a++;
+            }
         }
-        Move *move_b = &b->moves[rand() % MAX_MOVES];
-        while (move_b->name[0] == '\0' || move_b->PP <= 0) {
-            move_b = &b->moves[rand() % MAX_MOVES];
+
+        if (count_a > 0) {
+            int random_index = rand() % count_a;
+            move_a = &a->moves[valid_moves_a[random_index]];
+        }
+
+        // seleção controlada para o pokémon b
+        Move *move_b = NULL;
+        int valid_moves_b[MAX_MOVES];
+        int count_b = 0;
+
+        for (int i = 0; i < MAX_MOVES; i++) {
+            if (b->moves[i].name[0] != '\0' && b->moves[i].PP > 0) {
+                valid_moves_b[count_b] = i;
+                count_b++;
+            }
+        }
+
+        if (count_b > 0) {
+            int random_index = rand() % count_b;
+            move_b = &b->moves[valid_moves_b[random_index]];
+        }
+
+        // valdição de segurança
+        // se algum pokémon não tiver nenhum golpe com pp disponível,
+        // encerra o loop para evitar travamentos indesejados.
+        if (move_a == NULL || move_b == NULL) {
+            printf("\nUm dos pokémon ficou sem movimentos utilizáveis!\n");
+            break;
         }
         
+        // executa o turno de forma limpa
         run_turn(a, b, move_a, move_b);
     }
+
     printf("\n--- BATTLE END ---\n");
-    if (a->current_hp > 0) {
+    if (a->current_hp > 0 && b->current_hp <= 0) {
         printf("\n%s wins!\n", a->name);
-    } else if (b->current_hp > 0) {
+    } else if (b->current_hp > 0 && a->current_hp <= 0) {
         printf("\n%s wins!\n", b->name);
     } else {
         printf("\nIt's a tie!\n");
